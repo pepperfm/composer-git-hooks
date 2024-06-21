@@ -8,3 +8,4 @@ cghooks.lock
 composer.lock
 .phpunit.result.cache
 .php-cs-fixer.cache
+cghooks-E
