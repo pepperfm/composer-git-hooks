@@ -35,7 +35,7 @@ Add a `hooks` section to the `extra` section of your `composer.json` and add the
 Then install with
 
 ```sh
-composer require --dev brainmaestro/composer-git-hooks
+composer require --dev pepperfm/composer-git-hooks
 ```
 
 This installs the `cghooks` binary to your `vendor/bin` folder. If this folder is not in your path, you will need to preface every command with `vendor/bin/`.
@@ -47,7 +47,7 @@ Note: hooks declared in the `scripts` or `hooks` root sections of `composer.json
 You can also install it globally. This feels much more natural when `cghooks` is used with the newly added support for managing global git hooks.
 
 ```sh
-composer global require --dev brainmaestro/composer-git-hooks
+composer global require --dev pepperfm/composer-git-hooks
 ```
 
 All commands have global support (besides testing the hooks. Still requires being in the directory with the `composer.json` file).
@@ -203,14 +203,12 @@ Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
 The MIT License (MIT). Please see [License File](LICENSE) for more information.
 
-[badge-downloads]: https://img.shields.io/packagist/dt/brainmaestro/composer-git-hooks.svg?style=flat-square
+[badge-downloads]: https://img.shields.io/packagist/dt/pepperfm/composer-git-hooks.svg?style=flat-square
 [badge-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg
-[badge-packagist]: https://img.shields.io/packagist/v/brainmaestro/composer-git-hooks.svg?style=flat-square
+[badge-packagist]: https://img.shields.io/packagist/v/pepperfm/composer-git-hooks.svg?style=flat-square
 [badge-stable]: https://poser.pugx.org/your-app-rocks/eloquent-uuid/v/stable
-[badge-travis]: https://img.shields.io/travis/BrainMaestro/composer-git-hooks.svg?style=flat-square
 [link-author]: https://github.com/BrainMaestro
 [link-composer-events]: https://getcomposer.org/doc/articles/scripts.md#command-events
 [link-contributors]: ../../contributors
 [link-husky]: https://github.com/typicode/husky
-[link-packagist]: https://packagist.org/packages/brainmaestro/composer-git-hooks
-[link-travis]: https://travis-ci.org/BrainMaestro/composer-git-hooks
+[link-packagist]: https://packagist.org/packages/pepperfm/composer-git-hooks
