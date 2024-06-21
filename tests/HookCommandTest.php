@@ -3,13 +3,13 @@
 namespace BrainMaestro\GitHooks\Tests;
 
 use BrainMaestro\GitHooks\Commands\HookCommand;
+use PHPUnit\Framework\Attributes\Test;
 use Symfony\Component\Console\Tester\CommandTester;
 
 class HookCommandTest extends TestCase
 {
-    /**
-     * @test
-     */
+    /** @test  */
+    #[Test]
     public function it_tests_hooks_that_exist()
     {
         foreach (self::$hooks as $hook => $script) {
@@ -21,9 +21,8 @@ class HookCommandTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
+    /** @test  */
+    #[Test]
     public function it_terminates_if_previous_hook_fails()
     {
         $hook = [

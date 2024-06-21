@@ -1,5 +1,5 @@
 {
-    "name": "brainmaestro/composer-git-hooks",
+    "name": "pepperfm/composer-git-hooks",
     "description": "Easily manage git hooks in your composer config",
     "type": "library",
     "minimum-stability": "stable",
@@ -13,16 +13,19 @@
         {
             "name": "Ezinwa Okpoechi",
             "email": "brainmaestro@outlook.com"
+        },
+        {
+            "name": "Dmitry Gaponenko",
+            "email": "Damon3453@yandex.ru"
         }
     ],
     "require": {
-        "php": "^8.0|^8.1",
-        "symfony/console": "^5.0|^6.0"
+        "phpunit/phpunit": "^9|^10|^11",
+        "symfony/console": "^5.0|^6.0|^7.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^9.5",
-        "friendsofphp/php-cs-fixer": "^3.0",
-        "ext-json": "*"
+        "ext-json": "*",
+        "friendsofphp/php-cs-fixer": "^3.59"
     },
     "autoload": {
         "psr-4": {
@@ -57,9 +60,9 @@
             "pre-commit": "composer check-style",
             "pre-push": [
                 "composer test",
-                "appver=$(grep -o -E '\\d.\\d.\\d(-alpha.\\d)?' cghooks)",
+                "appver=$(grep -o -E '[0-9]+\\.[0-9]+\\.[0-9]+(-alpha\\.[0-9]+)?' cghooks)",
                 "tag=$(git tag | tail -n 1)",
-                "if [ \"$tag\" != \"v$appver\" ]; then",
+                "if [ \"$tag\" != \"$appver\" ]; then",
                 "echo \"The most recent tag $tag does not match the application version $appver\\n\"",
                 "tag=${tag#v}",
                 "sed -i -E \"s/$appver/$tag/\" cghooks",
