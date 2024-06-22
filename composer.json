@@ -50,7 +50,8 @@
         "post-update-cmd": "./cghooks update",
         "check-style": "php-cs-fixer fix --using-cache=no --diff --dry-run .",
         "fix-style": "php-cs-fixer fix --using-cache=no .",
-        "pint": "./vendor/bin/pint -v --test"
+        "pint": "./vendor/bin/pint -v --test",
+        "pint-hard": "./vendor/bin/pint"
     },
     "scripts-descriptions": {
         "test": "Run all tests.",
@@ -62,10 +63,6 @@
             "pre-commit": ["composer check-style", "composer pint"],
             "pre-push": [
                 "composer test",
-                "appver=$(grep -o -E '[0-9]+\\.[0-9]+\\.[0-9]+(-alpha\\.[0-9]+)?' cghooks)",
-                "tag=$(git tag | tail -n 1)",
-                "if [ \"$tag\" != \"$appver\" ]; then",
-                "echo \"The most recent tag $tag does not match the application version $appver\\n\"",
                 "tag=${tag#v}",
                 "sed -i -E \"s/$appver/$tag/\" cghooks",
                 "exit 1",

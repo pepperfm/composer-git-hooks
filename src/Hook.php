@@ -39,6 +39,7 @@ class Hook
      * @param string $section config section to fetch in the composer.json
      *
      * @throws \Exception
+     *
      * @return array
      */
     public static function getConfig(string $dir, string $section): array
@@ -59,6 +60,7 @@ class Hook
      * @param string $hook
      *
      * @throws \Exception
+     *
      * @return bool
      */
     public static function stopHookOnFailure(string $dir, string $hook): bool
@@ -140,6 +142,7 @@ class Hook
      * @param string $dir
      *
      * @throws \Exception
+     *
      * @return array
      */
     public static function getCustomHooks(string $dir): array
