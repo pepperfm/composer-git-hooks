@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BrainMaestro\GitHooks\Commands;
 
 use BrainMaestro\GitHooks\Hook;
@@ -9,13 +11,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class HookCommand extends SymfonyCommand
 {
-    private $hook;
+    private string $hook;
 
-    private $contents;
+    private array|string $contents;
 
-    private $composerDir;
+    private string $composerDir;
 
-    public function __construct($hook, $contents, $composerDir)
+    public function __construct(string $hook, array|string $contents, string $composerDir)
     {
         $this->hook = $hook;
         $this->contents = $contents;
@@ -23,12 +25,12 @@ class HookCommand extends SymfonyCommand
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName($this->hook)
-            ->setDescription("Test your {$this->hook} hook")
-            ->setHelp("This command allows you to test your {$this->hook} hook");
+            ->setDescription("Test your $this->hook hook")
+            ->setHelp("This command allows you to test your $this->hook hook");
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

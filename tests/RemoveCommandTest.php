@@ -1,41 +1,40 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BrainMaestro\GitHooks\Tests;
 
 use BrainMaestro\GitHooks\Commands\RemoveCommand;
 use BrainMaestro\GitHooks\Hook;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Console\Output\OutputInterface;
 
-/**
- * @group remove
- */
+#[Group('remove')]
 class RemoveCommandTest extends TestCase
 {
     /** @var CommandTester */
-    private $commandTester;
+    private CommandTester $commandTester;
 
-    public function init()
+    public function init(): void
     {
         self::createHooks('.git', true);
         $this->commandTester = new CommandTester(new RemoveCommand());
     }
 
-    /** @test  */
     #[Test]
-    public function it_removes_hooks_that_were_added()
+    public function it_removes_hooks_that_were_added(): void
     {
         $this->commandTester->execute([]);
 
         foreach (array_keys(self::$hooks) as $hook) {
-            $this->assertStringContainsString("Removed {$hook} hook", $this->commandTester->getDisplay());
+            $this->assertStringContainsString("Removed $hook hook", $this->commandTester->getDisplay());
         }
     }
 
-    /** @test  */
     #[Test]
-    public function it_removes_custom_hooks_that_were_added()
+    public function it_removes_custom_hooks_that_were_added(): void
     {
         $customHooks = [
             'config' => [
@@ -49,12 +48,11 @@ class RemoveCommandTest extends TestCase
 
         $this->commandTester->execute([]);
 
-        $this->assertStringContainsString("Removed pre-flow-feature-start hook", $this->commandTester->getDisplay());
+        $this->assertStringContainsString('Removed pre-flow-feature-start hook', $this->commandTester->getDisplay());
     }
 
-    /** @test  */
     #[Test]
-    public function it_removes_removed_hooks_from_the_lock_file()
+    public function it_removes_removed_hooks_from_the_lock_file(): void
     {
         foreach (array_keys(self::$hooks) as $hook) {
             $contents = file_get_contents('.gitignore');
@@ -63,7 +61,7 @@ class RemoveCommandTest extends TestCase
             $this->assertEquals(0, $return);
 
             $this->commandTester->execute(['hooks' => [$hook]]);
-            $this->assertStringContainsString("Removed {$hook} hook", $this->commandTester->getDisplay());
+            $this->assertStringContainsString("Removed $hook hook", $this->commandTester->getDisplay());
 
             $contents = file_get_contents('.gitignore');
             $return = strpos($contents, Hook::LOCK_FILE);
@@ -71,84 +69,76 @@ class RemoveCommandTest extends TestCase
         }
     }
 
-    /** @test  */
     #[Test]
-    public function it_removes_individual_hooks()
+    public function it_removes_individual_hooks(): void
     {
         foreach (array_keys(self::$hooks) as $hook) {
             $this->commandTester->execute(['hooks' => [$hook]]);
-            $this->assertStringContainsString("Removed {$hook} hook", $this->commandTester->getDisplay());
+            $this->assertStringContainsString("Removed $hook hook", $this->commandTester->getDisplay());
         }
     }
 
-    /** @test  */
     #[Test]
-    public function it_does_not_remove_hooks_not_present_in_the_lock_file()
+    public function it_does_not_remove_hooks_not_present_in_the_lock_file(): void
     {
         $hook = 'pre-commit';
         unlink(Hook::LOCK_FILE);
 
         $this->commandTester->execute(['hooks' => [$hook]], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE]);
         $this->assertStringContainsString(
-            "Skipped {$hook} hook - not present in lock file",
+            "Skipped $hook hook - not present in lock file",
             $this->commandTester->getDisplay()
         );
     }
 
-    /** @test  */
     #[Test]
-    public function it_removes_hooks_not_present_in_the_lock_file_if_forced_to()
+    public function it_removes_hooks_not_present_in_the_lock_file_if_forced_to(): void
     {
         $hook = 'pre-commit';
         unlink(Hook::LOCK_FILE);
-        touch(".git/hooks/{$hook}");
+        touch(".git/hooks/$hook");
 
         $this->commandTester->execute(['hooks' => [$hook], '--force' => true]);
-        $this->assertStringContainsString("Removed {$hook} hook", $this->commandTester->getDisplay());
+        $this->assertStringContainsString("Removed $hook hook", $this->commandTester->getDisplay());
     }
 
-    /** @test  */
     #[Test]
-    public function it_uses_a_different_git_path_if_specified()
+    public function it_uses_a_different_git_path_if_specified(): void
     {
         $gitDir = 'test-git-dir';
         self::createHooks($gitDir, true);
 
-        $this->assertFalse(self::isDirEmpty("{$gitDir}/hooks"));
+        $this->assertFalse(self::isDirEmpty("$gitDir/hooks"));
 
         $this->commandTester->execute(['--git-dir' => $gitDir]);
         foreach (array_keys(self::$hooks) as $hook) {
-            $this->assertStringContainsString("Removed {$hook} hook", $this->commandTester->getDisplay());
+            $this->assertStringContainsString("Removed $hook hook", $this->commandTester->getDisplay());
         }
 
-        $this->assertTrue(self::isDirEmpty("{$gitDir}/hooks"));
+        $this->assertTrue(self::isDirEmpty("$gitDir/hooks"));
     }
 
-    /** @test  */
     #[Test]
-    public function it_removes_global_git_hooks()
+    public function it_removes_global_git_hooks(): void
     {
         $gitDir = 'test-global-git-dir';
-        $hookDir = "{$gitDir}/hooks";
+        $hookDir = "$gitDir/hooks";
 
         self::createHooks($gitDir, true);
         self::createTestComposerFile($gitDir);
         $this->assertFalse(self::isDirEmpty($hookDir));
 
-        shell_exec("git config --global core.hooksPath {$hookDir}");
+        shell_exec("git config --global core.hooksPath $hookDir");
 
         $this->commandTester->execute(['--global' => true]);
 
         foreach (array_keys(self::$hooks) as $hook) {
-            $this->assertStringContainsString("Removed {$hook} hook", $this->commandTester->getDisplay());
+            $this->assertStringContainsString("Removed $hook hook", $this->commandTester->getDisplay());
         }
     }
 
-    /**
-     * @test
-     * @group lock-dir
-     */
-    public function it_removes_git_hooks_with_lock_dir()
+    #[Group('lock-dir')]
+    public function it_removes_git_hooks_with_lock_dir(): void
     {
         $lockDir = realpath(getcwd()) . '/../lock-dir';
         if (!file_exists($lockDir)) {
@@ -159,12 +149,12 @@ class RemoveCommandTest extends TestCase
 
         $this->commandTester->execute(['--lock-dir' => dirname($hookFile)]);
         foreach (array_keys(self::$hooks) as $hook) {
-            $this->assertStringContainsString("Removed {$hook} hook", $this->commandTester->getDisplay());
+            $this->assertStringContainsString("Removed $hook hook", $this->commandTester->getDisplay());
         }
         self::rmdir($lockDir);
     }
 
-    private static function isDirEmpty($dir)
+    private static function isDirEmpty($dir): bool
     {
         return count(scandir($dir)) === 2;
     }

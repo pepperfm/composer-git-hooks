@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BrainMaestro\GitHooks\Tests;
 
 use BrainMaestro\GitHooks\Commands\HookCommand;
@@ -8,9 +10,8 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 class HookCommandTest extends TestCase
 {
-    /** @test  */
     #[Test]
-    public function it_tests_hooks_that_exist()
+    public function it_tests_hooks_that_exist(): void
     {
         foreach (self::$hooks as $hook => $script) {
             $command = new HookCommand($hook, $script, '.');
@@ -21,14 +22,13 @@ class HookCommandTest extends TestCase
         }
     }
 
-    /** @test  */
     #[Test]
-    public function it_terminates_if_previous_hook_fails()
+    public function it_terminates_if_previous_hook_fails(): void
     {
         $hook = [
             'pre-commit' => [
                 'echo execution-error;exit 1',
-                'echo before-commit'
+                'echo before-commit',
             ],
         ];
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BrainMaestro\GitHooks\Commands;
 
 use BrainMaestro\GitHooks\Hook;
@@ -9,15 +11,21 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 abstract class Command extends SymfonyCommand
 {
-    private $output;
+    protected string $dir;
 
-    protected $dir;
     protected $composerDir;
-    protected $hooks;
-    protected $gitDir;
-    protected $lockDir;
-    protected $global;
-    protected $lockFile;
+
+    protected array $hooks;
+
+    protected mixed $gitDir;
+
+    protected mixed $lockDir;
+
+    protected mixed $global;
+
+    protected string $lockFile;
+
+    private OutputInterface $output;
 
     abstract protected function init(InputInterface $input);
 
@@ -34,16 +42,15 @@ abstract class Command extends SymfonyCommand
                 ? dirname(global_hook_dir())
                 : $this->gitDir
         );
-        if ($this->global) {
-            if (empty($this->dir)) {
-                $this->global_dir_fallback();
-            }
+        if ($this->global && empty($this->dir)) {
+            $this->global_dir_fallback();
         }
         if ($this->gitDir === false) {
             $output->writeln('Git is not initialized. Skip setting hooks...');
+
             return SymfonyCommand::SUCCESS;
         }
-        $this->lockFile = (null !== $this->lockDir ? ($this->lockDir . '/') : '') . Hook::LOCK_FILE;
+        $this->lockFile = ($this->lockDir !== null ? ($this->lockDir . '/') : '') . Hook::LOCK_FILE;
 
         $dir = $this->global ? $this->dir : getcwd();
 
@@ -55,28 +62,26 @@ abstract class Command extends SymfonyCommand
         return SymfonyCommand::SUCCESS;
     }
 
-    protected function global_dir_fallback()
+    protected function global_dir_fallback(): void
     {
     }
 
-    protected function info($info)
+    protected function info($info): void
     {
-        $info = str_replace('[', '<info>', $info);
-        $info = str_replace(']', '</info>', $info);
+        $info = str_replace(['[', ']'], ['<info>', '</info>'], $info);
 
         $this->output->writeln($info);
     }
 
-    protected function debug($debug)
+    protected function debug($debug): void
     {
-        $debug = str_replace('[', '<comment>', $debug);
-        $debug = str_replace(']', '</comment>', $debug);
+        $debug = str_replace(['[', ']'], ['<comment>', '</comment>'], $debug);
 
         $this->output->writeln($debug, OutputInterface::VERBOSITY_VERBOSE);
     }
 
-    protected function error($error)
+    protected function error($error): void
     {
-        $this->output->writeln("<fg=red>{$error}</>");
+        $this->output->writeln("<fg=red>$error</>");
     }
 }

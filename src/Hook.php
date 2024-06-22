@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BrainMaestro\GitHooks;
 
 use Exception;
@@ -7,6 +9,7 @@ use Exception;
 class Hook
 {
     public const LOCK_FILE = 'cghooks.lock';
+
     public const CONFIG_SECTIONS = ['custom-hooks', 'stop-on-failure'];
 
     /**
@@ -18,7 +21,7 @@ class Hook
      *
      * @return string
      */
-    public static function getHookContents($dir, $contents, $hook)
+    public static function getHookContents(string $dir, array|string $contents, string $hook): string
     {
         if (is_array($contents)) {
             $commandsSequence = self::stopHookOnFailure($dir, $hook);
@@ -32,24 +35,21 @@ class Hook
     /**
      * Get config section of the composer config file.
      *
-     * @param  string $dir dir where to look for composer.json
-     * @param  string $section config section to fetch in the composer.json
+     * @param string $dir dir where to look for composer.json
+     * @param string $section config section to fetch in the composer.json
      *
+     * @throws \Exception
      * @return array
      */
-    public static function getConfig($dir, $section)
+    public static function getConfig(string $dir, string $section): array
     {
-        if (! in_array($section, self::CONFIG_SECTIONS)) {
-            throw new Exception("Invalid config section [{$section}]. Available sections: ".implode(', ', self::CONFIG_SECTIONS).'.');
+        if (!in_array($section, self::CONFIG_SECTIONS)) {
+            throw new Exception("Invalid config section [$section]. Available sections: ".implode(', ', self::CONFIG_SECTIONS).'.');
         }
 
         $json = self::getComposerJson($dir);
 
-        if (! isset($json['extra']['hooks']['config'][$section])) {
-            return [];
-        }
-
-        return $json['extra']['hooks']['config'][$section];
+        return $json['extra']['hooks']['config'][$section] ?? [];
     }
 
     /**
@@ -57,9 +57,11 @@ class Hook
      *
      * @param string $dir
      * @param string $hook
+     *
+     * @throws \Exception
      * @return bool
      */
-    public static function stopHookOnFailure($dir, $hook)
+    public static function stopHookOnFailure(string $dir, string $hook): bool
     {
         return in_array($hook, self::getConfig($dir, 'stop-on-failure'));
     }
@@ -67,25 +69,27 @@ class Hook
     /**
      * Get scripts section of the composer config file.
      *
-     * @param  string $dir Directory where to look for composer.json
+     * @param string $dir Directory where to look for composer.json
      *
      * @return array
      */
-    public static function getValidHooks($dir)
+    public static function getValidHooks(string $dir): array
     {
         $json = self::getComposerJson($dir);
 
-        $possibleHooks = isset($json['extra']['hooks']) ? $json['extra']['hooks'] : [];
+        $possibleHooks = $json['extra']['hooks'] ?? [];
 
-        return array_filter($possibleHooks, function ($hook) use ($dir) {
+        return array_filter($possibleHooks, static function ($hook) use ($dir) {
             return self::isDefaultHook($hook) || self::isCustomHook($dir, $hook);
         }, ARRAY_FILTER_USE_KEY);
     }
 
     /**
      * Check if a hook is valid
+     *
+     * @param mixed $hook
      */
-    private static function isDefaultHook($hook)
+    private static function isDefaultHook(mixed $hook): bool
     {
         return array_key_exists($hook, self::getDefaultHooks());
     }
@@ -93,56 +97,57 @@ class Hook
     /**
      * Get all default git hooks
      */
-    private static function getDefaultHooks()
+    private static function getDefaultHooks(): array
     {
         return array_flip([
-           'applypatch-msg',
-           'commit-msg',
-           'post-applypatch',
-           'post-checkout',
-           'post-commit',
-           'post-merge',
-           'post-receive',
-           'post-rewrite',
-           'post-update',
-           'pre-applypatch',
-           'pre-auto-gc',
-           'pre-commit',
-           'pre-push',
-           'pre-rebase',
-           'pre-receive',
-           'prepare-commit-msg',
-           'push-to-checkout',
-           'update',
+            'applypatch-msg',
+            'commit-msg',
+            'post-applypatch',
+            'post-checkout',
+            'post-commit',
+            'post-merge',
+            'post-receive',
+            'post-rewrite',
+            'post-update',
+            'pre-applypatch',
+            'pre-auto-gc',
+            'pre-commit',
+            'pre-push',
+            'pre-rebase',
+            'pre-receive',
+            'prepare-commit-msg',
+            'push-to-checkout',
+            'update',
         ]);
     }
 
     /**
      * Check if a hook is valid
+     *
      * @param string $dir
      * @param string $hook
+     *
      * @return bool
      */
-    private static function isCustomHook($dir, $hook)
+    private static function isCustomHook(string $dir, string $hook): bool
     {
         return in_array($hook, self::getCustomHooks($dir));
     }
 
     /**
      * Get custom hooks from config `custom-hooks` section.
+     *
      * @param string $dir
+     *
+     * @throws \Exception
      * @return array
      */
-    public static function getCustomHooks($dir)
+    public static function getCustomHooks(string $dir): array
     {
         $customHooks = self::getConfig($dir, 'custom-hooks');
 
-        if (! $customHooks) {
+        if (!$customHooks) {
             return [];
-        }
-
-        if (! is_array($customHooks)) {
-            throw new Exception('Custom hooks must be an array.');
         }
 
         $configIndex = array_search('config', $customHooks);
@@ -156,14 +161,16 @@ class Hook
 
     /**
      * Reads and decodes composer.json content.
+     *
      * @param string $dir
+     *
      * @return array
      */
-    private static function getComposerJson($dir)
+    private static function getComposerJson(string $dir): array
     {
-        $composerFile = "{$dir}/composer.json";
+        $composerFile = "$dir/composer.json";
 
-        if (! file_exists($composerFile)) {
+        if (!file_exists($composerFile)) {
             return [];
         }
 

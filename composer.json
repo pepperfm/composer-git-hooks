@@ -25,7 +25,8 @@
     },
     "require-dev": {
         "ext-json": "*",
-        "friendsofphp/php-cs-fixer": "^3.59"
+        "friendsofphp/php-cs-fixer": "^3.59",
+        "laravel/pint": "^1.16"
     },
     "autoload": {
         "psr-4": {
