@@ -62,11 +62,7 @@
         "hooks": {
             "pre-commit": ["composer check-style", "composer pint"],
             "pre-push": [
-                "composer test",
-                "tag=${tag#v}",
-                "sed -i -E \"s/$appver/$tag/\" cghooks",
-                "exit 1",
-                "fi"
+                "composer test"
             ]
         }
     }
